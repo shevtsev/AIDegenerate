@@ -1,5 +1,5 @@
-import requests, asyncio, json, os, re
-from telebot import types, TeleBot
+import requests, asyncio, json, os
+from telebot import TeleBot
 from dotenv import load_dotenv
 from telethon import TelegramClient, events
 from bs4 import BeautifulSoup
@@ -42,15 +42,7 @@ class Parsers(neural_networks):
 
             chat = await client.get_entity(event.message.peer_id)
             if f"@{chat.username}" in channels:
-                if event.media and event.media.photo:
-                    # Обработка сообщений с изображениями
-                    await event.download_media("img.png")
-                    photo = open("img.png", "rb")
-                    os.remove("img.png")
-                    #Отправка новости в канал
-                    self.__bot.send_photo(chat_id=self.__chat_id, caption=str(event.raw_text), photo=photo, reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']))
-                else:
-                    self.__bot.send_message(chat_id=self.__chat_id, text=str(event.raw_text), reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']))
+                self.__bot.send_message(chat_id=self.__chat_id, text=str(event.raw_text), reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']))
         return client
     
     #Парсер для сайтов
@@ -60,11 +52,10 @@ class Parsers(neural_networks):
 
         #Цикл обработки новой новости
         while True:
-            with open("AI_degenerate_bot/files/urls.json", 'r') as file:
-                urls = json.load(file)['urls']
             for news, link in urls.items():
                 href = self.__site_parse_method(news=news, link=link)
                 if href != last_news[news]:
+                    print(last_news)
                     self.__bot.send_message(chat_id=self.__chat_id, text=href, reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']), parse_mode='html')
                     last_news[news] = href
             await asyncio.sleep(5)

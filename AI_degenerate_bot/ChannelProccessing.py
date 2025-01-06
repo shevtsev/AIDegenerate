@@ -1,5 +1,6 @@
 import json
-from telebot import TeleBot, types
+from md2tgmd import escape
+from telebot import TeleBot
 from dotenv import load_dotenv
 from Auxillary_class import keyboards
 from neural_networks import neural_networks
@@ -20,7 +21,7 @@ def request_processing(template: dict[str, str], prompt: str, photo=open("AI_deg
     text = nn.free_gpt_4o_mini(text_prompt)
     text = text[:1020].rsplit(' ', 1)[0] + '...' if len(text) >= 1024 else text
     keyboard = key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Убрать изображение'], ['public', 'reject', 'img_del'])
-    bot.send_photo(chat_id=private_chat_id, photo=photo, caption=key.html_tags_insert(text), reply_markup=keyboard, parse_mode='MarkdownV2')
+    bot.send_photo(chat_id=private_chat_id, photo=photo, caption=escape(text), reply_markup=keyboard, parse_mode='MarkdownV2')
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):

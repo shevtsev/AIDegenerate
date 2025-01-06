@@ -2,3 +2,5 @@ session.*
 .env
 venv/
 __pycache__/
+out.log
+nohup.out

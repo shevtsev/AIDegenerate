@@ -6,3 +6,4 @@ telebot==0.0.5
 pyTelegramBotAPI==4.25.0
 Telethon==1.38.1
 pillow==11.1.0
+md2tgmd==0.3.9
