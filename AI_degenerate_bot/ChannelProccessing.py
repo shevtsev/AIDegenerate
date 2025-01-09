@@ -15,7 +15,7 @@ bot = TeleBot(environ['TOKEN'])
 public_chat_id = '-1002307638261'
 private_chat_id = '-1002376640623'
 
-def request_processing(template: dict[str, str], prompt: str, photo=open("AI_degenerate_bot/files/empty_img.png", "rb")) -> None:
+def request_processing(template: dict[str, str], prompt: str, photo: bytes) -> None:
     text_prompt = template["text"] + prompt
         
     text = nn.free_gpt_4o_mini(text_prompt)
@@ -39,12 +39,12 @@ def handle_query(call):
         #С сайта
         elif 'https://' in call.message.text:
             text = call.message.text
-            request_processing(template['sites_prompt'], text)
+            request_processing(template['sites_prompt'], text, open("AI_degenerate_bot/files/empty_img.png", "rb"))
             bot.delete_message(call.message.chat.id, call.message.message_id)
         #С тг канала без картинки
         else:
             text = call.message.text
-            request_processing(template['tg_prompt'], text)
+            request_processing(template['tg_prompt'], text, open("AI_degenerate_bot/files/empty_img.png", "rb"))
             bot.delete_message(call.message.chat.id, call.message.message_id)
 
     if call.data == 'delete':
@@ -74,4 +74,4 @@ def handle_query(call):
         bot.delete_message(call.message.chat.id, call.message.message_id)
 
 if __name__ == "__main__":
-    bot.infinity_polling()
+    bot.infinity_polling(timeout=10, long_polling_timeout=5)

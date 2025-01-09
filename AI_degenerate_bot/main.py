@@ -17,15 +17,19 @@ class Parsers(neural_networks):
 #Private
     #Получение ссылки и заголовки новости
     def __site_parse_method(self, news: str, link: list[str]) -> str:
-        response = requests.get(news)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        el = soup.find(link[0], class_=link[1])
-        href = el['href']
-        if "https://" in href:
-            return href
-        elif link[2] != "":
-            return link[2] + href
-        return news+href
+        try:
+            response = requests.get(news)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            el = soup.find(link[0], class_=link[1])
+            href = el['href']
+            if "https://" in href:
+                return href
+            elif link[2] != "":
+                return link[2] + href
+            return news+href
+        except Exception as e:
+            print(e)
+            return None
 
 #Public
     #Парсер для тг каналов
@@ -48,17 +52,19 @@ class Parsers(neural_networks):
     #Парсер для сайтов
     async def SitesParse(self, urls: dict[str, list[str|bool]]):
         #Последние опубликованные новости
-        last_news = {news: self.__site_parse_method(news=news, link=link) for news, link in urls.items()}
+        last_news = {news: [self.__site_parse_method(news=news, link=link)] for news, link in urls.items()}
 
         #Цикл обработки новой новости
         while True:
             for news, link in urls.items():
                 href = self.__site_parse_method(news=news, link=link)
-                if href != last_news[news]:
-                    print(last_news)
+                if href is not None and href not in last_news[news]:
+                    print(last_news[news])
                     self.__bot.send_message(chat_id=self.__chat_id, text=href, reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']), parse_mode='html')
-                    last_news[news] = href
-            await asyncio.sleep(5)
+                    if len(last_news[news]) > 4:
+                        last_news[news].pop(0)
+                    last_news[news].append(href)
+            await asyncio.sleep(10)
 
 if __name__ == "__main__":
     with open("AI_degenerate_bot/files/urls.json", 'r') as file:
