@@ -1,18 +1,19 @@
-import requests, asyncio, json, os
+import requests, asyncio, json, logging
 from telebot import TeleBot
-from dotenv import load_dotenv
 from telethon import TelegramClient, events
 from bs4 import BeautifulSoup
 from Auxillary_class import keyboards
 from neural_networks import neural_networks
+from files.config import config
 
-load_dotenv()
 key = keyboards()
+logger = logging.getLogger(__name__)
+
 #Класс со всеми парсерами
 class Parsers(neural_networks):
     def __init__(self):
-        self.__bot = TeleBot(token=os.environ['TOKEN'])
-        self.__chat_id = -1002376640623
+        self.__bot = TeleBot(token=config.token)
+        self.__chat_id = config.chat_id
 
 #Private
     #Получение ссылки и заголовки новости
@@ -28,15 +29,12 @@ class Parsers(neural_networks):
                 return link[2] + href
             return news+href
         except Exception as e:
-            print(e)
-            return None
+            logger.error(f"Error in site_parse_method: {e}")
 
 #Public
     #Парсер для тг каналов
     def telegram_parser(self, loop=None) -> TelegramClient:
-        api_id = os.environ['API_ID']
-        api_hash = os.environ['API_HASH']
-        client = TelegramClient('session', api_id, api_hash, loop=loop)
+        client = TelegramClient('session', config.api_id, config.api_hash, loop=loop)
         client.start()
 
         @client.on(events.NewMessage())
@@ -53,17 +51,17 @@ class Parsers(neural_networks):
     async def SitesParse(self, urls: dict[str, list[str|bool]]):
         #Последние опубликованные новости
         last_news = {news: [self.__site_parse_method(news=news, link=link)] for news, link in urls.items()}
-
+        logger.info(f"News dict: {last_news}")
         #Цикл обработки новой новости
         while True:
             for news, link in urls.items():
                 href = self.__site_parse_method(news=news, link=link)
                 if href is not None and href not in last_news[news]:
-                    print(last_news[news])
                     self.__bot.send_message(chat_id=self.__chat_id, text=href, reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']), parse_mode='html')
-                    if len(last_news[news]) > 4:
+                    if len(last_news[news] >= 5):
                         last_news[news].pop(0)
                     last_news[news].append(href)
+                    logging.info(f"Added news: {href}, new list of news: {last_news}")
             await asyncio.sleep(10)
 
 if __name__ == "__main__":

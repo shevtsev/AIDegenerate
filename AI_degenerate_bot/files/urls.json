@@ -2,7 +2,6 @@
     "channels": ["@naebnet", "@whackdoor", "@ai_newz", "@cgevent"],
     "urls": {
             "https://www.ferra.ru/news"            : ["a", "jsx-3299022473", "https://www.ferra.ru"],
-            "https://www.securitylab.ru/news"      : ["a", "article-card", "https://www.securitylab.ru"],
             "https://ai.cnews.ru"                  : ["a", "black", ""],
             "https://the-decoder.com"              : ["a", "link-overlay", ""],
             "https://qz.com/tech-innovation/ai"    : ["a", "sc-1pw4fyi-5", ""]

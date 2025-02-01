@@ -1,5 +1,7 @@
-import requests, json, os, io
-from PIL import Image
+import requests, json, logging
+from files.config import config
+
+logger = logging.getLogger(__name__)
 
 # Neural networks class
 class neural_networks:
@@ -13,13 +15,16 @@ class neural_networks:
             "model": "pixtral-12b-2409"
         }
         response = requests.post("https://api.mistral.ai/v1/chat/completions",
-                                headers={"Content-Type": "application/json", "Authorization": "Bearer "+ os.environ['MISTRAL_TOKEN']},
+                                headers={"Content-Type": "application/json", "Authorization": "Bearer "+ config.mistral_token},
                                 json=data)
         response = json.loads(response.text)
-        if response.get("choices", False):
+        if response.status_code == 200:
+            logger.info(f"Mistral large API request was successful, status code: {response.status_code}")
+            response = json.loads(response.text)
             return response["choices"][0]["message"]["content"]
         else:
-            return "Возникла ошибка"
+            logger.error(f"Mistral large API request error, status code: {response.status_code}, response text: {response.content}")
+            return "Возникла ошибка, попробуйте позже"
 
     def free_gpt_4o_mini(self, prompt: str) -> tuple[str, int, int]|str:
         data = {
@@ -30,9 +35,12 @@ class neural_networks:
             "model": "gpt-4o-mini"
         }
         response = requests.post("https://models.inference.ai.azure.com/chat/completions",
-                                headers={"Authorization": os.environ['GIT_TOKEN'], "Content-Type" : "application/json"},
+                                headers={"Authorization": config.git_token, "Content-Type" : "application/json"},
                                 json=data)
         if response.status_code == 200:
+            logger.info(f"GPT 4o mini API request was successful, status code: {response.status_code}")
             response = json.loads(response.text)
             return response["choices"][0]["message"]["content"]
+        else:
+            logger.error(f"GPT 4o mini API request error, status code: {response.status_code}, response text: {response.content}")
         return self._mistral_large_2407(prompt=prompt) 
