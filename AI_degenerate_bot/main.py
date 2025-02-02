@@ -1,4 +1,4 @@
-import requests, asyncio, json, logging
+import requests, asyncio, logging
 from telebot import TeleBot
 from telethon import TelegramClient, events
 from bs4 import BeautifulSoup
@@ -9,14 +9,14 @@ from files.config import config
 key = keyboards()
 logger = logging.getLogger(__name__)
 
-#Класс со всеми парсерами
+# Класс со всеми парсерами
 class Parsers(neural_networks):
     def __init__(self):
         self.__bot = TeleBot(token=config.token)
         self.__chat_id = config.chat_id
 
-#Private
-    #Получение ссылки и заголовки новости
+# Private
+    # Получение ссылки и заголовки новости
     def __site_parse_method(self, news: str, link: list[str]) -> str:
         try:
             response = requests.get(news)
@@ -39,8 +39,7 @@ class Parsers(neural_networks):
 
         @client.on(events.NewMessage())
         async def handler(event):
-            with open("AI_degenerate_bot/files/urls.json", 'r') as file:
-                channels = list(json.load(file)['channels'])
+            channels = list(config.urls['channels'])
 
             chat = await client.get_entity(event.message.peer_id)
             if f"@{chat.username}" in channels:
@@ -58,15 +57,14 @@ class Parsers(neural_networks):
                 href = self.__site_parse_method(news=news, link=link)
                 if href is not None and href not in last_news[news]:
                     self.__bot.send_message(chat_id=self.__chat_id, text=href, reply_markup=key.keyboard_two_blank(['Выбрать', 'Удалить'], ['select', 'delete']), parse_mode='html')
-                    if len(last_news[news] >= 5):
+                    if len(last_news[news]) >= 5:
                         last_news[news].pop(0)
                     last_news[news].append(href)
                     logging.info(f"Added news: {href}, new list of news: {last_news}")
             await asyncio.sleep(10)
 
 if __name__ == "__main__":
-    with open("AI_degenerate_bot/files/urls.json", 'r') as file:
-        urls = json.load(file)['urls']
+    urls = config.urls['urls']
     parse = Parsers()
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)

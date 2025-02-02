@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 # Neural networks class
 class neural_networks:
     
-    def _mistral_large_2407(self, prompt: list[dict[str, str]]) -> tuple[str, int, int]|str:
+    def _mistral_large_2407(self, prompt: str) -> str:
         data = {
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.6,
@@ -26,7 +26,7 @@ class neural_networks:
             logger.error(f"Mistral large API request error, status code: {response.status_code}, response text: {response.content}")
             return "Возникла ошибка, попробуйте позже"
 
-    def free_gpt_4o_mini(self, prompt: str) -> tuple[str, int, int]|str:
+    def free_gpt_4o_mini(self, prompt: str) -> str:
         data = {
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.6,

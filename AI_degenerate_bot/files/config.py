@@ -1,4 +1,4 @@
-import logging
+import logging, json
 from dotenv import load_dotenv
 from os import environ as env
 from dataclasses import dataclass
@@ -21,6 +21,11 @@ class Config:
         cls.__instance.api_hash = env['API_HASH']
         cls.__instance.mistral_token = env['MISTRAL_TOKEN']
         cls.__instance.git_token = env['GIT_TOKEN']
+        with open("AI_degenerate_bot/files/urls.json", "r") as file:
+            cls.__instance.urls = json.load(file)
+        with open("AI_degenerate_bot/files/prompts.json", "r") as file:
+            cls.__instance.template = json.load(file)
+        cls.__instance.empty_image = open("AI_degenerate_bot/files/empty_img.png", "rb")
         return cls.__instance
       
 config = Config()

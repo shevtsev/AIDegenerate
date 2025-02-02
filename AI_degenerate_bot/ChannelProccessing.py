@@ -1,4 +1,4 @@
-import json, logging, time
+import logging, time
 from md2tgmd import escape
 from telebot import TeleBot
 from Auxillary_class import keyboards
@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 
 def request_processing(template: dict[str, str], prompt: str, photo: bytes) -> None:
     text_prompt = template["text"] + prompt
-        
     text = nn.free_gpt_4o_mini(text_prompt)
     text = text[:1020].rsplit(' ', 1)[0] + '...' if len(text) >= 1024 else text
     keyboard = key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Убрать изображение'], ['public', 'reject', 'img_del'])
@@ -21,15 +20,11 @@ def request_processing(template: dict[str, str], prompt: str, photo: bytes) -> N
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     if call.data == 'select':
-        #Настройка шаблона промпта
-        with open("AI_degenerate_bot/files/prompts.json", "r") as file:
-            template = json.load(file)
-
         #Из тг канала с картинкой
         if call.message.caption is not None:
             text = call.message.caption
             photo = bot.download_file(bot.get_file(call.message.photo[-1].file_id).file_path)
-            request_processing(template['tg_prompt'], text, photo)
+            request_processing(config.template['tg_prompt'], text, photo)
             try:
                 bot.delete_message(call.message.chat.id, call.message.message_id)
             except Exception as e:
@@ -37,7 +32,7 @@ def handle_query(call):
         #С сайта
         elif 'https://' in call.message.text:
             text = call.message.text
-            request_processing(template['sites_prompt'], text, open("AI_degenerate_bot/files/empty_img.png", "rb"))
+            request_processing(config.template['sites_prompt'], text, config.empty_image)
             try:
                 bot.delete_message(call.message.chat.id, call.message.message_id)
             except Exception as e:
@@ -45,7 +40,7 @@ def handle_query(call):
         #С тг канала без картинки
         else:
             text = call.message.text
-            request_processing(template['tg_prompt'], text, open("AI_degenerate_bot/files/empty_img.png", "rb"))
+            request_processing(config.template['tg_prompt'], text, config.empty_image)
             try:
                 bot.delete_message(call.message.chat.id, call.message.message_id)
             except Exception as e:
