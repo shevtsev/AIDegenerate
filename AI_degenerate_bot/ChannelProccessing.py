@@ -10,29 +10,22 @@ nn = neural_networks()
 bot = TeleBot(config.token)
 logger = logging.getLogger(__name__)
 
-def request_processing(template: dict[str, str], prompt: str, photo: bytes) -> None:
+def request_processing(template: dict[str, str], prompt: str) -> None:
     text_prompt = template["text"] + prompt
+    
     text = nn.free_gpt_4o_mini(text_prompt)
     text = text[:1020].rsplit(' ', 1)[0] + '...' if len(text) >= 1024 else text
     keyboard = key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Убрать изображение'], ['public', 'reject', 'img_del'])
-    bot.send_photo(chat_id=config.private_chat_id, photo=photo, caption=escape(text), reply_markup=keyboard, parse_mode='MarkdownV2')
+    img = open("AI_degenerate_bot/files/empty_img.png", "rb")
+    bot.send_photo(chat_id=config.private_chat_id, photo=img, caption=escape(text), reply_markup=keyboard, parse_mode='MarkdownV2')
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     if call.data == 'select':
-        #Из тг канала с картинкой
-        if call.message.caption is not None:
-            text = call.message.caption
-            photo = bot.download_file(bot.get_file(call.message.photo[-1].file_id).file_path)
-            request_processing(config.template['tg_prompt'], text, photo)
-            try:
-                bot.delete_message(call.message.chat.id, call.message.message_id)
-            except Exception as e:
-                logger.error(f"Error while deleting message: {e}")
         #С сайта
-        elif 'https://' in call.message.text:
+        if 'https://' in call.message.text:
             text = call.message.text
-            request_processing(config.template['sites_prompt'], text, config.empty_image)
+            request_processing(config.template['sites_prompt'], text)
             try:
                 bot.delete_message(call.message.chat.id, call.message.message_id)
             except Exception as e:
@@ -40,7 +33,7 @@ def handle_query(call):
         #С тг канала без картинки
         else:
             text = call.message.text
-            request_processing(config.template['tg_prompt'], text, config.empty_image)
+            request_processing(config.template['tg_prompt'], text)
             try:
                 bot.delete_message(call.message.chat.id, call.message.message_id)
             except Exception as e:

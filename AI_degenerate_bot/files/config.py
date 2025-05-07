@@ -25,7 +25,6 @@ class Config:
             cls.__instance.urls = json.load(file)
         with open("AI_degenerate_bot/files/prompts.json", "r") as file:
             cls.__instance.template = json.load(file)
-        cls.__instance.empty_image = open("AI_degenerate_bot/files/empty_img.png", "rb")
         return cls.__instance
       
 config = Config()
