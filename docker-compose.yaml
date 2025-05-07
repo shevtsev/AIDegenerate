@@ -1,0 +1,7 @@
+services:
+  ai_degenerate:
+    image: ai_degenerate
+    build:
+      context: .
+      network: host
+    restart: always

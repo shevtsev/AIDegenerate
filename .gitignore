@@ -4,3 +4,4 @@ venv/
 __pycache__/
 out.log
 nohup.out
+.DS_Store
