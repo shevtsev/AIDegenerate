@@ -1,7 +1,13 @@
 services:
-  ai_degenerate:
-    image: ai_degenerate
+  Bot:
+    image: bot
     build:
-      context: .
+      context: ./Bot
+      network: host
+    restart: always
+  Parser:
+    image: parser
+    build:
+      context: ./Parse
       network: host
     restart: always

@@ -16,7 +16,7 @@ def request_processing(template: dict[str, str], prompt: str) -> None:
     text = nn.mistral_large_2407(text_prompt)
     text = text[:1020].rsplit(' ', 1)[0] + '...' if len(text) >= 1024 else text
     keyboard = key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Убрать изображение'], ['public', 'reject', 'img_del'])
-    img = open("AI_degenerate_bot/files/empty_img.png", "rb")
+    img = open("files/empty_img.png", "rb")
     bot.send_photo(chat_id=config.private_chat_id, photo=img, caption=escape(text), reply_markup=keyboard, parse_mode='MarkdownV2')
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -74,7 +74,7 @@ def handle_query(call):
             logger.error(f"Error while deleting message: {e}")
     
     elif call.data == 'img_add':
-        bot.send_photo(chat_id =call.message.chat.id, photo=open("AI_degenerate_bot/files/empty_img.png", "rb"), caption=call.message.text, reply_markup=key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Добавить изображение'], ['public', 'reject', 'img_add']), parse_mode='html')
+        bot.send_photo(chat_id =call.message.chat.id, photo=open("files/empty_img.png", "rb"), caption=call.message.text, reply_markup=key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Добавить изображение'], ['public', 'reject', 'img_add']), parse_mode='html')
         try:
             bot.delete_message(call.message.chat.id, call.message.message_id)
         except Exception as e:

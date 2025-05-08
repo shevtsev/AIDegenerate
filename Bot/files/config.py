@@ -21,9 +21,9 @@ class Config:
         cls.__instance.api_hash = env['API_HASH']
         cls.__instance.mistral_token = env['MISTRAL_TOKEN']
         cls.__instance.git_token = env['GIT_TOKEN']
-        with open("AI_degenerate_bot/files/urls.json", "r") as file:
+        with open("files/urls.json", "r") as file:
             cls.__instance.urls = json.load(file)
-        with open("AI_degenerate_bot/files/prompts.json", "r") as file:
+        with open("files/prompts.json", "r") as file:
             cls.__instance.template = json.load(file)
         return cls.__instance
       
