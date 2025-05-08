@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def request_processing(template: dict[str, str], prompt: str) -> None:
     text_prompt = template["text"] + prompt
     
-    text = nn.free_gpt_4o_mini(text_prompt)
+    text = nn.mistral_large_2407(text_prompt)
     text = text[:1020].rsplit(' ', 1)[0] + '...' if len(text) >= 1024 else text
     keyboard = key.keyboard_two_blank(['Опубликовать', 'Отклонить', 'Убрать изображение'], ['public', 'reject', 'img_del'])
     img = open("AI_degenerate_bot/files/empty_img.png", "rb")

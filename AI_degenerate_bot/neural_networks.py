@@ -6,18 +6,17 @@ logger = logging.getLogger(__name__)
 # Neural networks class
 class neural_networks:
     
-    def _mistral_large_2407(self, prompt: str) -> str:
+    def mistral_large_2407(self, prompt: str) -> str:
         data = {
             "messages": [{"role": "user", "content": prompt}],
             "temperature": 0.6,
             "top_p": 0.8,
             "max_tokens": 1024,
-            "model": "pixtral-12b-2409"
+            "model": "mistral-large-latest"
         }
         response = requests.post("https://api.mistral.ai/v1/chat/completions",
                                 headers={"Content-Type": "application/json", "Authorization": "Bearer "+ config.mistral_token},
                                 json=data)
-        response = json.loads(response.text)
         if response.status_code == 200:
             logger.info(f"Mistral large API request was successful, status code: {response.status_code}")
             response = json.loads(response.text)
@@ -43,4 +42,4 @@ class neural_networks:
             return response["choices"][0]["message"]["content"]
         else:
             logger.error(f"GPT 4o mini API request error, status code: {response.status_code}, response text: {response.content}")
-        return self._mistral_large_2407(prompt=prompt) 
+        return self.mistral_large_2407(prompt=prompt) 
