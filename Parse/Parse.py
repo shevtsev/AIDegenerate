@@ -51,6 +51,7 @@ class Parsers(neural_networks):
         #Последние опубликованные новости
         last_news = {news: [self.__site_parse_method(news=news, link=link)] for news, link in urls.items()}
         logger.info(f"News dict: {last_news}")
+        
         #Цикл обработки новой новости
         while True:
             for news, link in urls.items():
