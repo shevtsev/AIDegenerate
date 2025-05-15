@@ -3,17 +3,11 @@ services:
     image: bot
     build:
       context: ./Bot
-    networks:
-      - app-network
+      network: host
     restart: always
   Parser:
     image: parser
     build:
       context: ./Parse
-    networks:
-      - app-network
+      network: host
     restart: always
-
-networks:
-  app-network:
-    driver: bridge
